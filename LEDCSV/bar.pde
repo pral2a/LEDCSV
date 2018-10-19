@@ -6,7 +6,7 @@ class Bar {
 
   color[][]timeColor;
 
-  int timeColorSel = 0;
+  int timeColorSel = 0, nextTimeColorSel= 0, prevColorSel = 0;
 
   boolean testMode;
 
@@ -101,11 +101,14 @@ class Bar {
 
     if (step+1 >= data.length) {
       v2 = data[0][1];
+      nextTimeColorSel = data[0][0];
     } else {
       v2 = data[step+1][1];
+      nextTimeColorSel = data[step+1][0];
     }
 
     amt = 0;
+    prevColorSel = timeColorSel;
     timeColorSel = data[step][0];
     startRiseTime = millis();
   }
@@ -114,10 +117,23 @@ class Bar {
   void drawRect() {
     int barHeight = height - int(map(vN, 0, rangeMax, 0, height));
     setGradient(int(pos.x), int(pos.y), barWidth-1, height, timeColor[timeColorSel][0], timeColor[timeColorSel][1]);
-    fill(0);
+    dayNightTransition();
     noStroke();  
+    fill(0);
     if (testMode == false) return;
     rect(pos.x, pos.y, barWidth + pos.x, barHeight);
+  }
+
+  void dayNightTransition() {
+    float alpha = 0;
+    if (timeColorSel != nextTimeColorSel) {
+      alpha = abs(map(amt, 0, 1, 0, 255));
+    } else if (prevColorSel != timeColorSel) {
+      alpha = abs(map(amt, 0, 1, 255, 0));
+    } 
+    noStroke();  
+    fill(0, 0, 0, alpha);
+    rect(pos.x, pos.y, barWidth + pos.x, height);
   }
 
   void setGradient(int x, int y, float w, float h, color c1, color c2) {
